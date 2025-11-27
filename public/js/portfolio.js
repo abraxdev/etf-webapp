@@ -33,14 +33,22 @@ async function loadPortfolio() {
     const result = await response.json();
 
     if (result.success && result.data && result.data.length > 0) {
-      portfolioData = result.data.map(item => ({
-        tipologia: item.tipologia || '-',
-        ticker: item.ticker || '-',
-        nome: item.nome || '-',
-        qty: item.qty || 0,
-        dividend: item.div_yield || 0,
-        isin: item.isin
-      }));
+      portfolioData = result.data.map(item => {
+        const qty = parseFloat(item.qty) || 0;
+        const prezzo = parseFloat(item.last_price) || 0;
+        const posizione = qty * prezzo;
+
+        return {
+          tipologia: item.tipologia || '-',
+          ticker: item.ticker || '-',
+          nome: item.nome || '-',
+          qty: qty,
+          dividend: item.div_yield || 0,
+          prezzo: prezzo,
+          posizione: posizione,
+          isin: item.isin
+        };
+      });
 
       filteredData = [...portfolioData];
       sortAndRender();
@@ -82,7 +90,7 @@ function sortAndRender() {
     let bVal = b[currentSort.column];
 
     // Gestione numeri
-    if (currentSort.column === 'qty' || currentSort.column === 'dividend') {
+    if (currentSort.column === 'qty' || currentSort.column === 'dividend' || currentSort.column === 'posizione') {
       aVal = parseFloat(aVal) || 0;
       bVal = parseFloat(bVal) || 0;
     } else {
@@ -120,6 +128,8 @@ function renderTable() {
       <td>${item.nome}</td>
       <td style="text-align: center; font-weight: 600;">${formatNumber(item.qty)}</td>
       <td style="text-align: center; font-weight: 600; color: #38a169;">${formatPercentage(item.dividend)}</td>
+      <td style="text-align: center; font-weight: 600; color: #2d3748;">${formatCurrency(item.prezzo)}</td>
+      <td style="text-align: center; font-weight: 700; color: #3182ce;">${formatCurrency(item.posizione)}</td>
     `;
 
     tbody.appendChild(row);
@@ -130,7 +140,7 @@ function renderTable() {
 
 // Aggiorna indicatori ordinamento
 function updateSortIndicators() {
-  ['tipologia', 'ticker', 'nome', 'qty', 'dividend'].forEach(col => {
+  ['tipologia', 'ticker', 'nome', 'qty', 'dividend', 'posizione'].forEach(col => {
     const indicator = document.getElementById(`sort-${col}`);
     if (indicator) {
       if (col === currentSort.column) {
@@ -195,6 +205,12 @@ function formatPercentage(num) {
   return n.toFixed(2) + '%';
 }
 
+// Formattazione valuta
+function formatCurrency(num) {
+  const n = parseFloat(num) || 0;
+  return n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
 // Export to CSV
 function exportToCSV() {
   if (filteredData.length === 0) {
@@ -203,7 +219,7 @@ function exportToCSV() {
   }
 
   // Prepara l'header CSV
-  const headers = ['Tipologia', 'Ticker', 'Nome', 'Quantità', 'Dividend'];
+  const headers = ['Tipologia', 'Ticker', 'Nome', 'Quantità', 'Dividend', 'Prezzo', 'Posizione'];
   const csvRows = [];
 
   // Aggiungi header
@@ -216,7 +232,9 @@ function exportToCSV() {
       escapeCSV(item.ticker),
       escapeCSV(item.nome),
       formatNumberForCSV(item.qty),
-      formatNumberForCSV(item.dividend)
+      formatNumberForCSV(item.dividend),
+      formatNumberForCSV(item.prezzo),
+      formatNumberForCSV(item.posizione)
     ];
     csvRows.push(row.join(';'));
   });

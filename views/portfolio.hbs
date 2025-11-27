@@ -44,6 +44,7 @@
                     <option value="nome">Nome</option>
                     <option value="qty">Quantità</option>
                     <option value="dividend">Dividend</option>
+                    <option value="posizione">Posizione</option>
                 </select>
             </div>
         </div>
@@ -90,6 +91,12 @@
                         </th>
                         <th style="cursor: pointer;" onclick="sortByColumn('dividend')">
                             Dividend <span id="sort-dividend"></span>
+                        </th>
+                        <th>
+                            Prezzo
+                        </th>
+                        <th style="cursor: pointer;" onclick="sortByColumn('posizione')">
+                            Posizione <span id="sort-posizione"></span>
                         </th>
                     </tr>
                 </thead>
