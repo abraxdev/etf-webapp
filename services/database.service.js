@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+import supabase from '../config/supabase.js';
 
 class DatabaseService {
   // Test connessione
@@ -187,4 +187,4 @@ class DatabaseService {
   }
 }
 
-module.exports = new DatabaseService();
+export default new DatabaseService();

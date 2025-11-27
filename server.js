@@ -1,11 +1,16 @@
-require('dotenv').config();
-const express = require('express');
-const { engine } = require('express-handlebars');
-const path = require('path');
+import 'dotenv/config';
+import express from 'express';
+import { engine } from 'express-handlebars';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const etfRoutes = require('./routes/etf.routes');
-const scraperRoutes = require('./routes/scraper.routes');
-const portfolioRoutes = require('./routes/portfolio.routes');
+import etfRoutes from './routes/etf.routes.js';
+import scraperRoutes from './routes/scraper.routes.js';
+import portfolioRoutes from './routes/portfolio.routes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

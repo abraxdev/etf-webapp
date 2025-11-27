@@ -2,13 +2,18 @@
   "name": "etf-tracker",
   "version": "1.0.0",
   "description": "ETF Dividend Tracker with Supabase",
+  "type":"module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "scrape": "node services/scraper.service.js"
   },
-  "keywords": ["etf", "dividends", "tracker"],
+  "keywords": [
+    "etf",
+    "dividends",
+    "tracker"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -16,7 +21,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
-    "puppeteer": "^21.6.1"
+    "puppeteer": "^21.6.1",
+    "yahoo-finance2": "^3.10.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

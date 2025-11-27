@@ -1,4 +1,4 @@
-const dbService = require('../services/database.service');
+import dbService from '../services/database.service.js';
 
 class ETFController {
   async getAll(req, res) {
@@ -117,4 +117,4 @@ class ETFController {
   }
 }
 
-module.exports = new ETFController();
+export default new ETFController();

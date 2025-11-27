@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const dbService = require('./database.service');
+import puppeteer from 'puppeteer';
+import dbService from './database.service.js';
 
 class ScraperService {
   async scrapeETF(isin) {
@@ -135,4 +135,4 @@ class ScraperService {
   }
 }
 
-module.exports = new ScraperService();
+export default new ScraperService();

@@ -1,5 +1,6 @@
-const scraperService = require('../services/scraper.service');
-const dbService = require('../services/database.service');
+import scraperService from '../services/scraper.service.js';
+import yahooService from '../services/yahoo.service.js';
+import dbService from '../services/database.service.js';
 
 class ScraperController {
   async scrapeOne(req, res) {
@@ -71,19 +72,69 @@ class ScraperController {
   async scrapeAll(req, res) {
     try {
       // Avvia scraping in background
-      res.json({ 
-        success: true, 
-        message: 'Scraping avviato in background' 
+      res.json({
+        success: true,
+        message: 'Scraping avviato in background'
       });
 
-      // Esegui scraping
-      const result = await scraperService.scrapeAllETF();
-      console.log('✅ Scraping completato:', result);
-      
+      // Fase 1: Esegui scraping JustETF
+      console.log('🚀 Fase 1: Scraping JustETF...');
+      const justEtfResult = await scraperService.scrapeAllETF();
+      console.log('✅ Scraping JustETF completato:', justEtfResult);
+
+      // Fase 2: Esegui scraping Yahoo Finance
+      console.log('🚀 Fase 2: Scraping Yahoo Finance...');
+      const yahooResult = await yahooService.updateAllTitles();
+      console.log('✅ Scraping Yahoo Finance completato:', yahooResult);
+
     } catch (error) {
       console.error('❌ Errore scraping:', error);
     }
   }
+
+  async scrapeYahooAll(req, res) {
+    try {
+      // Avvia scraping Yahoo Finance in background
+      res.json({
+        success: true,
+        message: 'Scraping Yahoo Finance avviato in background'
+      });
+
+      // Esegui scraping Yahoo Finance
+      const result = await yahooService.updateAllTitles();
+      console.log('✅ Scraping Yahoo Finance completato:', result);
+
+    } catch (error) {
+      console.error('❌ Errore scraping Yahoo Finance:', error);
+    }
+  }
+
+  async scrapeYahooOne(req, res) {
+    try {
+      const { isin } = req.params;
+
+      if (!isin || !isin.match(/^[A-Z]{2}[A-Z0-9]{10}$/)) {
+        return res.status(400).json({
+          success: false,
+          error: 'ISIN non valido'
+        });
+      }
+
+      // Esegui scraping Yahoo Finance per singolo titolo
+      const result = await yahooService.updateSingleTitle(isin);
+
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
 }
 
-module.exports = new ScraperController();
+export default new ScraperController();
