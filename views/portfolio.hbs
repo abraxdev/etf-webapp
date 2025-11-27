@@ -5,11 +5,14 @@
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h2 style="color: #2d3748; margin-bottom: 8px;">💼 Recap Portfolio</h2>
+                <h2 style="color: #2d3748; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="briefcase" style="width: 28px; height: 28px;"></i>
+                    Recap Portfolio
+                </h2>
                 <p style="color: #718096; font-size: 14px;">Panoramica completa del tuo portafoglio ETF e Stock</p>
             </div>
             <button class="btn btn-secondary" onclick="loadPortfolio()">
-                <span>🔄</span>
+                <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i>
                 <span>Ricarica</span>
             </button>
         </div>
@@ -18,7 +21,9 @@
     <!-- KPI Cards -->
     <div class="kpi-container">
         <div class="kpi-card kpi-primary">
-            <div class="kpi-icon">💰</div>
+            <div class="kpi-icon">
+                <i data-lucide="wallet" style="width: 48px; height: 48px;"></i>
+            </div>
             <div class="kpi-content">
                 <div class="kpi-label">Valore Totale</div>
                 <div class="kpi-value" id="kpiTotalValue">€ 0,00</div>
@@ -26,7 +31,9 @@
             </div>
         </div>
         <div class="kpi-card kpi-success">
-            <div class="kpi-icon">📊</div>
+            <div class="kpi-icon">
+                <i data-lucide="coins" style="width: 48px; height: 48px;"></i>
+            </div>
             <div class="kpi-content">
                 <div class="kpi-label">Dividendi Totali</div>
                 <div class="kpi-value" id="kpiDividends">€ 0,00</div>
@@ -34,7 +41,9 @@
             </div>
         </div>
         <div class="kpi-card kpi-info">
-            <div class="kpi-icon">🎯</div>
+            <div class="kpi-icon">
+                <i data-lucide="target" style="width: 48px; height: 48px;"></i>
+            </div>
             <div class="kpi-content">
                 <div class="kpi-label">Numero Asset</div>
                 <div class="kpi-value" id="kpiAssetCount">0</div>
@@ -67,7 +76,10 @@
 
     <!-- Filtri -->
     <div class="card">
-        <h3 style="color: #2d3748; margin-bottom: 15px;">🔍 Filtri e Ordinamento</h3>
+        <h3 style="color: #2d3748; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="filter" style="width: 20px; height: 20px;"></i>
+            Filtri e Ordinamento
+        </h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="filterTipologia">Filtra per Tipologia</label>

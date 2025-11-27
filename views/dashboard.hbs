@@ -19,7 +19,10 @@
 
     <!-- Form Aggiungi Titolo -->
     <div class="card">
-        <h2 style="margin-bottom: 20px; color: #2d3748;">➕ Aggiungi Nuovo Titolo</h2>
+        <h2 style="margin-bottom: 20px; color: #2d3748; display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="plus-circle" style="width: 24px; height: 24px;"></i>
+            Aggiungi Nuovo Titolo
+        </h2>
         <form id="addEtfForm">
             <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px;">
                 <div class="form-group" style="margin-bottom: 0;">
@@ -60,7 +63,7 @@
             </div>
             <div style="margin-top: 20px;">
                 <button type="submit" class="btn btn-primary" id="addBtn">
-                    <span>➕</span>
+                    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                     <span>Aggiungi Titolo</span>
                 </button>
             </div>
@@ -70,18 +73,21 @@
     <!-- Tabella Titoli -->
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: #2d3748;">📋 Titoli Monitorati</h2>
+            <h2 style="color: #2d3748; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="list-checks" style="width: 24px; height: 24px;"></i>
+                Titoli Monitorati
+            </h2>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-primary" id="scrapeJustETFBtn">
-                    <span>📈</span>
+                    <i data-lucide="trending-up" style="width: 18px; height: 18px;"></i>
                     <span>Aggiorna Info ETF</span>
                 </button>
                 <button class="btn btn-success" id="scrapeYahooBtn">
-                    <span>💹</span>
+                    <i data-lucide="download-cloud" style="width: 18px; height: 18px;"></i>
                     <span>Aggiorna Info YF</span>
                 </button>
                 <button class="btn btn-secondary" onclick="loadETFs()">
-                    <span>🔄</span>
+                    <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i>
                     <span>Ricarica</span>
                 </button>
             </div>

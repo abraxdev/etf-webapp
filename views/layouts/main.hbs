@@ -8,12 +8,15 @@
 </head>
 <body>
     {{> header}}
-    
+
     <main class="main-content">
         {{{body}}}
     </main>
-    
+
     {{> footer}}
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     {{#if isPortfolio}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -22,5 +25,10 @@
     {{else}}
     <script src="/js/dashboard.js"></script>
     {{/if}}
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
