@@ -250,15 +250,15 @@ async function scrapeOne(isin) {
     }
 }
 
-// Scrape tutti gli ETF (escluse le Stock)
-document.getElementById('scrapeAllBtn').addEventListener('click', async () => {
-    if (!confirm('Vuoi aggiornare TUTTI gli ETF?\n\nNota: Le Stock verranno automaticamente escluse.\n\nL\'operazione potrebbe richiedere diversi minuti.')) {
+// Scrape JustETF (solo ETF, escluse le Stock)
+document.getElementById('scrapeJustETFBtn').addEventListener('click', async () => {
+    if (!confirm('Vuoi aggiornare le info da JustETF?\n\nNota: Solo gli ETF verranno aggiornati (le Stock escluse).\n\nL\'operazione potrebbe richiedere diversi minuti.')) {
         return;
     }
 
-    const btn = document.getElementById('scrapeAllBtn');
+    const btn = document.getElementById('scrapeJustETFBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span>⏳</span><span>Aggiornamento in corso...</span>';
+    btn.innerHTML = '<span>⏳</span><span>Aggiornamento...</span>';
 
     try {
         const response = await fetch('/api/scraper/run', {
@@ -268,21 +268,57 @@ document.getElementById('scrapeAllBtn').addEventListener('click', async () => {
         const result = await response.json();
 
         if (result.success) {
-            showAlert('✅ Aggiornamento ETF avviato! Le Stock sono state escluse. I dati verranno aggiornati in background. Ricarica la pagina tra qualche minuto.', 'success');
-            
+            showAlert('✅ Scraping JustETF avviato! I dati verranno aggiornati in background. Ricarica tra qualche minuto.', 'success');
+
             // Ricarica automaticamente dopo 30 secondi
             setTimeout(() => {
                 loadETFs();
             }, 30000);
         } else {
-            showAlert('Errore durante l\'avvio dell\'aggiornamento', 'error');
+            showAlert('Errore durante l\'avvio dello scraping JustETF', 'error');
         }
     } catch (error) {
         showAlert('Errore: ' + error.message, 'error');
         console.error(error);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span>🚀</span><span>Aggiorna Tutti ETF</span>';
+        btn.innerHTML = '<span>📈</span><span>Aggiorna Info ETF</span>';
+    }
+});
+
+// Scrape Yahoo Finance (tutti i titoli: ETF + Stock)
+document.getElementById('scrapeYahooBtn').addEventListener('click', async () => {
+    if (!confirm('Vuoi aggiornare le info da Yahoo Finance?\n\nTutti i titoli (ETF e Stock) verranno aggiornati.\n\nL\'operazione potrebbe richiedere diversi minuti.')) {
+        return;
+    }
+
+    const btn = document.getElementById('scrapeYahooBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span><span>Aggiornamento...</span>';
+
+    try {
+        const response = await fetch('/api/scraper/yahoo/run', {
+            method: 'POST'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showAlert('✅ Scraping Yahoo Finance avviato! I dati verranno aggiornati in background. Ricarica tra qualche minuto.', 'success');
+
+            // Ricarica automaticamente dopo 30 secondi
+            setTimeout(() => {
+                loadETFs();
+            }, 30000);
+        } else {
+            showAlert('Errore durante l\'avvio dello scraping Yahoo Finance', 'error');
+        }
+    } catch (error) {
+        showAlert('Errore: ' + error.message, 'error');
+        console.error(error);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>💹</span><span>Aggiorna Info YF</span>';
     }
 });
 

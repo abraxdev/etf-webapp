@@ -28,15 +28,48 @@ class YahooFinanceService {
       const price = result.price || {};
       const summaryDetail = result.summaryDetail || {};
 
+      // Log raw data for debugging
+      console.log(`📊 Yahoo Finance RAW data for ${ticker}:`);
+      console.log(`   - dividendYield (FORWARD): ${summaryDetail.dividendYield}`);
+      console.log(`   - trailingAnnualDividendYield: ${summaryDetail.trailingAnnualDividendYield}`);
+      console.log(`   - dividendRate: ${summaryDetail.dividendRate}`);
+
+      // Usa FORWARD dividend yield come valore primario
+      let dividendYield = null;
+
+      // Priorità 1: Forward dividend yield
+      if (summaryDetail.dividendYield !== undefined && summaryDetail.dividendYield !== null) {
+        const rawValue = summaryDetail.dividendYield;
+        // Yahoo Finance restituisce questo come decimale (0.0369 = 3.69%)
+        if (rawValue < 1.0) {
+          dividendYield = (rawValue * 100).toFixed(2);
+        } else {
+          console.warn(`⚠️  ${ticker}: Valore forward dividend yield insolito: ${rawValue}`);
+          dividendYield = rawValue.toFixed(2);
+        }
+        console.log(`   ✓ Usando FORWARD dividend yield: ${dividendYield}%`);
+      }
+      // Fallback: Trailing dividend yield se forward non disponibile
+      else if (summaryDetail.trailingAnnualDividendYield !== undefined && summaryDetail.trailingAnnualDividendYield !== null) {
+        const rawValue = summaryDetail.trailingAnnualDividendYield;
+        if (rawValue < 1.0) {
+          dividendYield = (rawValue * 100).toFixed(2);
+        } else {
+          console.warn(`⚠️  ${ticker}: Valore trailing dividend yield insolito: ${rawValue}`);
+          dividendYield = rawValue.toFixed(2);
+        }
+        console.log(`   ⚠️  Usando TRAILING dividend yield (forward non disponibile): ${dividendYield}%`);
+      }
+
       const data = {
         ticker: ticker,
         name: price.longName || price.shortName || null,
         currentPrice: price.regularMarketPrice || null,
         currency: price.currency || null,
-        dividendYield: summaryDetail.trailingAnnualDividendYield
-          ? (summaryDetail.trailingAnnualDividendYield * 100).toFixed(2)
-          : null
+        dividendYield: dividendYield
       };
+
+      console.log(`   → Dividend yield finale: ${dividendYield}%\n`);
 
       return {
         success: true,
@@ -96,6 +129,7 @@ class YahooFinanceService {
             datiAggiornamento.nome = risultato.data.name;
           }
           if (risultato.data.dividendYield !== null) {
+            console.log(risultato.data.dividendYield);
             datiAggiornamento.div_yield = risultato.data.dividendYield;
           }
         }

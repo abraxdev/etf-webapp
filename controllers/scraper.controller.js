@@ -71,24 +71,19 @@ class ScraperController {
 
   async scrapeAll(req, res) {
     try {
-      // Avvia scraping in background
+      // Avvia scraping JustETF in background (SOLO JustETF, senza Yahoo)
       res.json({
         success: true,
-        message: 'Scraping avviato in background'
+        message: 'Scraping JustETF avviato in background'
       });
 
-      // Fase 1: Esegui scraping JustETF
-      console.log('🚀 Fase 1: Scraping JustETF...');
+      // Esegui SOLO scraping JustETF
+      console.log('🚀 Scraping JustETF avviato...');
       const justEtfResult = await scraperService.scrapeAllETF();
       console.log('✅ Scraping JustETF completato:', justEtfResult);
 
-      // Fase 2: Esegui scraping Yahoo Finance
-      console.log('🚀 Fase 2: Scraping Yahoo Finance...');
-      const yahooResult = await yahooService.updateAllTitles();
-      console.log('✅ Scraping Yahoo Finance completato:', yahooResult);
-
     } catch (error) {
-      console.error('❌ Errore scraping:', error);
+      console.error('❌ Errore scraping JustETF:', error);
     }
   }
 

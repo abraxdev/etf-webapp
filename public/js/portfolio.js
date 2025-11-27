@@ -1,6 +1,8 @@
 let portfolioData = [];
 let filteredData = [];
 let currentSort = { column: 'tipologia', order: 'asc' };
+let allocationChart = null;
+let treemapChart = null;
 
 // Caricamento iniziale
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,12 +40,20 @@ async function loadPortfolio() {
         const prezzo = parseFloat(item.last_price) || 0;
         const posizione = qty * prezzo;
 
+        // Gestisci dividend che può essere numero, stringa, NaN, N/A, null
+        let dividend = 0;
+        if (item.div_yield) {
+          const divString = String(item.div_yield).replace('%', '').replace(',', '.');
+          const divNum = parseFloat(divString);
+          dividend = (!isNaN(divNum) && isFinite(divNum)) ? divNum : 0;
+        }
+
         return {
           tipologia: item.tipologia || '-',
           ticker: item.ticker || '-',
           nome: item.nome || '-',
           qty: qty,
-          dividend: item.div_yield || 0,
+          dividend: dividend,
           prezzo: prezzo,
           posizione: posizione,
           isin: item.isin
@@ -51,6 +61,8 @@ async function loadPortfolio() {
       });
 
       filteredData = [...portfolioData];
+      updateKPIs();
+      updateCharts();
       sortAndRender();
 
       loading.style.display = 'none';
@@ -297,4 +309,247 @@ function showAlert(message, type = 'info') {
     alert.classList.add('fade-out');
     setTimeout(() => alert.remove(), 300);
   }, 3000);
+}
+
+// ===== KPI FUNCTIONS =====
+
+function updateKPIs() {
+  // Calcola valore totale portafoglio
+  const totalValue = portfolioData.reduce((sum, item) => sum + item.posizione, 0);
+
+  // Calcola dividendi totali - solo su titoli con dividend > 0
+  const dividendAssets = portfolioData.filter(item => {
+    const div = parseFloat(item.dividend);
+    return !isNaN(div) && div > 0;
+  });
+
+  console.log('=== DEBUG DIVIDENDI ===');
+  console.log('Titoli con dividendo:', dividendAssets.length);
+
+  // Calcola valore totale dividendi in € - somma per ogni titolo
+  let totalDividendValue = 0;
+  let totalDividendPositionValue = 0;
+
+  dividendAssets.forEach(item => {
+    const posizione = parseFloat(item.posizione) || 0;
+    const dividendYield = parseFloat(item.dividend) || 0;
+    const dividendAmount = (posizione * dividendYield) / 100;
+
+    totalDividendValue += dividendAmount;
+    totalDividendPositionValue += posizione;
+
+    console.log(`${item.ticker}: Posizione=${posizione.toFixed(2)}€, Yield=${dividendYield.toFixed(2)}%, Dividendo=${dividendAmount.toFixed(2)}€`);
+  });
+
+  console.log(`Totale Dividendi: ${totalDividendValue.toFixed(2)}€`);
+  console.log(`Totale Valore Posizioni con Dividendo: ${totalDividendPositionValue.toFixed(2)}€`);
+
+  // Yield medio ponderato (calcolato solo sul valore dei titoli con dividendo)
+  const averageYield = totalDividendPositionValue > 0
+    ? (totalDividendValue / totalDividendPositionValue) * 100
+    : 0;
+
+  console.log(`Yield Medio Ponderato: ${averageYield.toFixed(2)}%`);
+  console.log('======================');
+
+  // Calcola numero asset
+  const totalAssets = portfolioData.length;
+  const etfCount = portfolioData.filter(item => item.tipologia === 'ETF').length;
+  const stockCount = portfolioData.filter(item => item.tipologia === 'Stock').length;
+
+  // Aggiorna UI
+  document.getElementById('kpiTotalValue').textContent = formatCurrency(totalValue);
+  document.getElementById('kpiDividends').textContent = formatCurrency(totalDividendValue);
+  document.getElementById('kpiDividendPercent').textContent = `${averageYield.toFixed(2)}% Yield`;
+  document.getElementById('kpiAssetCount').textContent = totalAssets;
+  document.getElementById('kpiAssetBreakdown').textContent = `${etfCount} ETF · ${stockCount} Stock`;
+}
+
+// ===== CHART FUNCTIONS =====
+
+function updateCharts() {
+  try {
+    // Verifica che Chart.js sia caricato
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js non è caricato');
+      return;
+    }
+    updateAllocationChart();
+    updateTreemapChart();
+  } catch (error) {
+    console.error('Errore aggiornamento grafici:', error);
+  }
+}
+
+function updateAllocationChart() {
+  const etfValue = portfolioData
+    .filter(item => item.tipologia === 'ETF')
+    .reduce((sum, item) => sum + item.posizione, 0);
+
+  const stockValue = portfolioData
+    .filter(item => item.tipologia === 'Stock')
+    .reduce((sum, item) => sum + item.posizione, 0);
+
+  const ctx = document.getElementById('allocationChart');
+
+  if (allocationChart) {
+    allocationChart.destroy();
+  }
+
+  allocationChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['ETF', 'Stock'],
+      datasets: [{
+        data: [etfValue, stockValue],
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(16, 185, 129, 0.8)'
+        ],
+        borderColor: [
+          'rgba(59, 130, 246, 1)',
+          'rgba(16, 185, 129, 1)'
+        ],
+        borderWidth: 2,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            font: {
+              size: 14,
+              family: "'Inter', sans-serif",
+              weight: '500'
+            },
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: 12,
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
+              return `${label}: ${formatCurrency(value)} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateTreemapChart() {
+  // Prepara i dati per la treemap: ordina per posizione decrescente
+  const treemapData = portfolioData
+    .map(item => ({
+      ticker: item.ticker,
+      nome: item.nome,
+      value: item.posizione,
+      tipologia: item.tipologia
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  const ctx = document.getElementById('treemapChart');
+
+  if (treemapChart) {
+    treemapChart.destroy();
+  }
+
+  treemapChart = new Chart(ctx, {
+    type: 'treemap',
+    data: {
+      datasets: [{
+        tree: treemapData,
+        key: 'value',
+        groups: ['tipologia', 'ticker'],
+        spacing: 1,
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
+        backgroundColor: function(ctx) {
+          if (!ctx.raw) return 'transparent';
+          const item = ctx.raw._data;
+          return item.tipologia === 'ETF'
+            ? 'rgba(59, 130, 246, 0.7)'
+            : 'rgba(16, 185, 129, 0.7)';
+        },
+        hoverBackgroundColor: function(ctx) {
+          if (!ctx.raw) return 'transparent';
+          const item = ctx.raw._data;
+          return item.tipologia === 'ETF'
+            ? 'rgba(59, 130, 246, 0.9)'
+            : 'rgba(16, 185, 129, 0.9)';
+        },
+        labels: {
+          display: true,
+          formatter: function(ctx) {
+            if (!ctx.raw) return '';
+            const item = ctx.raw._data;
+            return [item.ticker, formatCurrency(item.value)];
+          },
+          color: 'white',
+          font: {
+            size: 13,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          }
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: 15,
+          titleFont: {
+            size: 15,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            title: function(context) {
+              if (!context[0].raw) return '';
+              return context[0].raw._data.ticker;
+            },
+            label: function(context) {
+              if (!context.raw) return '';
+              const item = context.raw._data;
+              const total = portfolioData.reduce((sum, p) => sum + p.posizione, 0);
+              const percentage = ((item.value / total) * 100).toFixed(2);
+              return [
+                `Nome: ${item.nome}`,
+                `Valore: ${formatCurrency(item.value)}`,
+                `Peso: ${percentage}%`,
+                `Tipo: ${item.tipologia}`
+              ];
+            }
+          }
+        }
+      }
+    }
+  });
 }
