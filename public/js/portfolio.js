@@ -317,40 +317,14 @@ function updateKPIs() {
   // Calcola valore totale portafoglio
   const totalValue = portfolioData.reduce((sum, item) => sum + item.posizione, 0);
 
-  // Calcola dividendi totali - solo su titoli con dividend > 0
-  const dividendAssets = portfolioData.filter(item => {
-    const div = parseFloat(item.dividend);
-    return !isNaN(div) && div > 0;
-  });
+  // Calcola dividendi totali (valore € e yield medio ponderato)
+  const dividendAssets = portfolioData.filter(item => parseFloat(item.dividend) > 0);
+  const totalDividendValue = dividendAssets.reduce((sum, item) => {
+    const dividendAmount = (item.posizione * parseFloat(item.dividend)) / 100;
+    return sum + dividendAmount;
+  }, 0);
 
-  console.log('=== DEBUG DIVIDENDI ===');
-  console.log('Titoli con dividendo:', dividendAssets.length);
-
-  // Calcola valore totale dividendi in € - somma per ogni titolo
-  let totalDividendValue = 0;
-  let totalDividendPositionValue = 0;
-
-  dividendAssets.forEach(item => {
-    const posizione = parseFloat(item.posizione) || 0;
-    const dividendYield = parseFloat(item.dividend) || 0;
-    const dividendAmount = (posizione * dividendYield) / 100;
-
-    totalDividendValue += dividendAmount;
-    totalDividendPositionValue += posizione;
-
-    console.log(`${item.ticker}: Posizione=${posizione.toFixed(2)}€, Yield=${dividendYield.toFixed(2)}%, Dividendo=${dividendAmount.toFixed(2)}€`);
-  });
-
-  console.log(`Totale Dividendi: ${totalDividendValue.toFixed(2)}€`);
-  console.log(`Totale Valore Posizioni con Dividendo: ${totalDividendPositionValue.toFixed(2)}€`);
-
-  // Yield medio ponderato (calcolato solo sul valore dei titoli con dividendo)
-  const averageYield = totalDividendPositionValue > 0
-    ? (totalDividendValue / totalDividendPositionValue) * 100
-    : 0;
-
-  console.log(`Yield Medio Ponderato: ${averageYield.toFixed(2)}%`);
-  console.log('======================');
+  const averageYield = totalValue > 0 ? (totalDividendValue / totalValue) * 100 : 0;
 
   // Calcola numero asset
   const totalAssets = portfolioData.length;
