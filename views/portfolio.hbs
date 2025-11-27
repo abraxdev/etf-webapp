@@ -1,0 +1,113 @@
+<div class="container">
+    <div id="alertContainer"></div>
+
+    <!-- Header Sezione -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="color: #2d3748; margin-bottom: 8px;">💼 Recap Portfolio</h2>
+                <p style="color: #718096; font-size: 14px;">Panoramica completa del tuo portafoglio ETF e Stock</p>
+            </div>
+            <button class="btn btn-secondary" onclick="loadPortfolio()">
+                <span>🔄</span>
+                <span>Ricarica</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtri -->
+    <div class="card">
+        <h3 style="color: #2d3748; margin-bottom: 15px;">🔍 Filtri e Ordinamento</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="filterTipologia">Filtra per Tipologia</label>
+                <select id="filterTipologia" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    <option value="">Tutte</option>
+                    <option value="ETF">ETF</option>
+                    <option value="Stock">Stock</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="searchInput">Cerca per Nome o Ticker</label>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Inserisci nome o ticker..."
+                    style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+                >
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="sortBy">Ordina per</label>
+                <select id="sortBy" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    <option value="tipologia">Tipologia</option>
+                    <option value="ticker">Ticker</option>
+                    <option value="nome">Nome</option>
+                    <option value="qty">Quantità</option>
+                    <option value="dividend">Dividend</option>
+                </select>
+            </div>
+        </div>
+        <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="toggleSortOrder()" id="sortOrderBtn">
+                    <span>⬆️</span>
+                    <span>Ordine: Crescente</span>
+                </button>
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <span>✖️</span>
+                    <span>Reset Filtri</span>
+                </button>
+            </div>
+            <button class="btn btn-success" onclick="exportToCSV()" id="exportBtn">
+                <span>📥</span>
+                <span>Esporta CSV</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabella Portfolio -->
+    <div class="card">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #718096;">Caricamento portfolio...</p>
+        </div>
+
+        <div class="table-container" id="tableContainer">
+            <table id="portfolioTable">
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;" onclick="sortByColumn('tipologia')">
+                            Tipologia <span id="sort-tipologia"></span>
+                        </th>
+                        <th style="cursor: pointer;" onclick="sortByColumn('ticker')">
+                            Ticker <span id="sort-ticker"></span>
+                        </th>
+                        <th style="cursor: pointer;" onclick="sortByColumn('nome')">
+                            Nome <span id="sort-nome"></span>
+                        </th>
+                        <th style="cursor: pointer;" onclick="sortByColumn('qty')">
+                            Quantità <span id="sort-qty"></span>
+                        </th>
+                        <th style="cursor: pointer;" onclick="sortByColumn('dividend')">
+                            Dividend <span id="sort-dividend"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="portfolioTableBody">
+                </tbody>
+            </table>
+            <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 8px; text-align: center;">
+                <span style="color: #4a5568; font-weight: 600;">Totale titoli visualizzati: </span>
+                <span id="totalCount" style="color: #3182ce; font-weight: 700; font-size: 18px;">0</span>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3>Nessun titolo nel portfolio</h3>
+            <p style="margin-top: 10px;">Vai alla Dashboard per aggiungere nuovi titoli</p>
+        </div>
+    </div>
+</div>

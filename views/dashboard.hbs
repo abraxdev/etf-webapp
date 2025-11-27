@@ -1,0 +1,135 @@
+<div class="container">
+    <div id="alertContainer"></div>
+
+    <!-- Statistiche -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">ETF Monitorati</div>
+            <div class="stat-value" id="statTotal">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Ultima Sincronizzazione</div>
+            <div class="stat-value" style="font-size: 16px;" id="statLastSync">Mai</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Rendimenti Salvati</div>
+            <div class="stat-value" id="statRendimenti">-</div>
+        </div>
+    </div>
+
+    <!-- Form Aggiungi Titolo -->
+    <div class="card">
+        <h2 style="margin-bottom: 20px; color: #2d3748;">➕ Aggiungi Nuovo Titolo</h2>
+        <form id="addEtfForm">
+            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="tipologiaSelect">Tipologia *</label>
+                    <select 
+                        id="tipologiaSelect" 
+                        required
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;"
+                    >
+                        <option value="ETF">ETF</option>
+                        <option value="Stock">Stock</option>
+                    </select>
+                    <div class="help-text">Tipo di titolo</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="isinInput">Codice ISIN *</label>
+                    <input 
+                        type="text" 
+                        id="isinInput" 
+                        placeholder="es. NL0011683594"
+                        pattern="[A-Z]{2}[A-Z0-9]{10}"
+                        required
+                        maxlength="12"
+                    >
+                    <div class="help-text">Codice ISIN a 12 caratteri</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="tickerInput">Ticker *</label>
+                    <input 
+                        type="text" 
+                        id="tickerInput" 
+                        placeholder="es. TDIV"
+                        required
+                        maxlength="10"
+                    >
+                    <div class="help-text">Simbolo ticker</div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary" id="addBtn">
+                    <span>➕</span>
+                    <span>Aggiungi Titolo</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabella Titoli -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #2d3748;">📋 Titoli Monitorati</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-success" id="scrapeAllBtn">
+                    <span>🚀</span>
+                    <span>Aggiorna Tutti ETF</span>
+                </button>
+                <button class="btn btn-secondary" onclick="loadETFs()">
+                    <span>🔄</span>
+                    <span>Ricarica</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #718096;">Caricamento...</p>
+        </div>
+
+        <div class="table-container" id="tableContainer">
+            <table id="etfTable">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>ISIN</th>
+                        <th>Nome</th>
+                        <th>Ticker</th>
+                        <th>Emittente</th>
+                        <th>Ultima Rendita</th>
+                        <th>Data Agg.</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="etfTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3>Nessun titolo monitorato</h3>
+            <p style="margin-top: 10px;">Aggiungi il primo titolo utilizzando il form sopra</p>
+        </div>
+    </div>
+
+    <!-- Modal Storico -->
+    <div id="modalStorico" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Storico Rendite</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading" id="modalLoading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px;">Caricamento storico...</p>
+                </div>
+                <div id="storicoContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
