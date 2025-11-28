@@ -30,6 +30,8 @@ class YahooFinanceService {
 
       // Log raw data for debugging
       console.log(`📊 Yahoo Finance RAW data for ${ticker}:`);
+      console.log(`   - currency: ${price.currency}`);
+      console.log(`   - currentPrice: ${price.regularMarketPrice}`);
       console.log(`   - dividendYield (FORWARD): ${summaryDetail.dividendYield}`);
       console.log(`   - trailingAnnualDividendYield: ${summaryDetail.trailingAnnualDividendYield}`);
       console.log(`   - dividendRate: ${summaryDetail.dividendRate}`);
@@ -123,7 +125,7 @@ class YahooFinanceService {
       if (risultato.success) {
         const datiAggiornamento = {};
 
-        // Per Stock: aggiorna nome, div_yield e last_price
+        // Per Stock: aggiorna nome, div_yield
         if (item.tipologia === 'Stock') {
           if (risultato.data.name) {
             datiAggiornamento.nome = risultato.data.name;
@@ -134,9 +136,13 @@ class YahooFinanceService {
           }
         }
 
-        // Per tutti (ETF e Stock): aggiorna last_price
+        // Per tutti (ETF e Stock): aggiorna last_price e currency
         if (risultato.data.currentPrice !== null) {
           datiAggiornamento.last_price = risultato.data.currentPrice;
+        }
+
+        if (risultato.data.currency !== null) {
+          datiAggiornamento.currency = risultato.data.currency;
         }
 
         // Aggiorna il database
@@ -229,7 +235,7 @@ class YahooFinanceService {
 
       const datiAggiornamento = {};
 
-      // Per Stock: aggiorna nome, div_yield e last_price
+      // Per Stock: aggiorna nome, div_yield
       if (item.tipologia === 'Stock') {
         if (risultato.data.name) {
           datiAggiornamento.nome = risultato.data.name;
@@ -239,9 +245,13 @@ class YahooFinanceService {
         }
       }
 
-      // Per tutti (ETF e Stock): aggiorna last_price
+      // Per tutti (ETF e Stock): aggiorna last_price e currency
       if (risultato.data.currentPrice !== null) {
         datiAggiornamento.last_price = risultato.data.currentPrice;
+      }
+
+      if (risultato.data.currency !== null) {
+        datiAggiornamento.currency = risultato.data.currency;
       }
 
       // Aggiorna il database
