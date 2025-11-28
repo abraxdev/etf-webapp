@@ -182,9 +182,10 @@ function toggleSortOrder() {
   currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
   const btn = document.getElementById('sortOrderBtn');
   btn.innerHTML = `
-    <span>${currentSort.order === 'asc' ? '⬆️' : '⬇️'}</span>
+    <i data-lucide="chevrons-${currentSort.order === 'asc' ? 'up' : 'down'}" width="16"></i>
     <span>Ordine: ${currentSort.order === 'asc' ? 'Crescente' : 'Decrescente'}</span>
   `;
+  lucide.createIcons();
   sortAndRender();
 }
 

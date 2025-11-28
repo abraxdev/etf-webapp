@@ -87,18 +87,18 @@ async function loadETFs() {
             const actionButtons = isETF 
                 ? `
                     <button class="btn btn-secondary" onclick="scrapeOne('${etf.isin}')">
-                        🔄 Aggiorna
+                        <i data-lucide="refresh-cw" width="18"></i>
                     </button>
                     <button class="btn btn-secondary" onclick="viewHistory('${etf.isin}')">
-                        📈 Storico
+                        <i data-lucide="chart-column" width="18"></i>
                     </button>
                   `
                 : `
                     <button class="btn btn-secondary" disabled title="Le Stock non vengono scrapate da JustETF">
-                        🔄 N/A
+                        <i data-lucide="refresh-cw" width="18"></i>
                     </button>
                     <button class="btn btn-secondary" onclick="viewHistory('${etf.isin}')">
-                        📈 Storico
+                        <i data-lucide="chart-column" width="18"></i>
                     </button>
                   `;
 
@@ -114,20 +114,16 @@ async function loadETFs() {
                         : (isStock ? '<span class="badge" style="background: #e2e8f0; color: #4a5568;">N/A</span>' : '<span class="badge badge-warning">Nessun dato</span>')
                     }
                 </td>
-                <td>
-                    ${hasRendita
-                        ? new Date(ultimaRendita.data_estrazione).toLocaleDateString('it-IT')
-                        : '-'
-                    }
-                </td>
+
                 <td class="actions">
                     ${actionButtons}
                     <button class="btn btn-danger" onclick="deleteETF('${etf.isin}')">
-                        🗑️
+                        <i data-lucide="trash-2" width="18"></i>
                     </button>
                 </td>
             `;
             tbody.appendChild(row);
+            lucide.createIcons();
         });
 
         await loadStats();

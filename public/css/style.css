@@ -5,9 +5,29 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: linear-gradient(135deg, #e4e4e4 0%, #fefefe 100%);
     min-height: 100vh;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+}
+
+h2 {
+    font-weight: 700;
+}
+
+h3 {
+    font-weight: 600;
+}
+
+select, textarea {
+    font-family: 'Inter', sans-serif;
 }
 
 /* Lucide Icons Styling */
@@ -52,6 +72,7 @@ i[data-lucide] {
 .logo h1 {
     color: #333;
     font-size: 24px;
+    font-weight: 700;
     margin-bottom: 5px;
 }
 
@@ -75,6 +96,7 @@ i[data-lucide] {
     padding: 8px 16px;
     border-radius: 6px;
     transition: all 0.3s;
+    font-weight: 500;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -113,6 +135,7 @@ i[data-lucide] {
 .stat-label {
     color: #718096;
     font-size: 12px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -143,6 +166,7 @@ input {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
     transition: border-color 0.3s;
 }
 
