@@ -61,15 +61,24 @@ class DatabaseService {
     }
   }
 
-  async createETF(isin, ticker = null, tipologia = 'ETF') {
+  async createETF(isin, ticker = null, tipologia = 'ETF', qty) {
+
     try {
+      // Converti qty in numero
+      const qtyNumber = qty ? parseFloat(qty) : null;
+
       const { data, error } = await supabase
         .from('etf')
-        .insert([{ isin, ticker, tipologia }])
+        .insert([{ isin, ticker, tipologia, qty: qtyNumber }])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Errore Supabase insert:", error);
+        throw error;
+      }
+
+      console.log("✅ ETF creato con successo:", data);
       return { success: true, data };
     } catch (error) {
       if (error.code === '23505') {

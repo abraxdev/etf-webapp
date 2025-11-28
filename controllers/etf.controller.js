@@ -33,30 +33,41 @@ class ETFController {
 
   async create(req, res) {
     try {
-      const { isin, ticker, tipologia } = req.body;
-      
+      const { isin, ticker, tipologia, qty } = req.body;
+
+      console.log("📝 Controller - Dati ricevuti:", { isin, ticker, tipologia, qty });
+      console.log("📝 Controller - Tipo qty:", typeof qty);
+
       if (!isin || !isin.match(/^[A-Z]{2}[A-Z0-9]{10}$/)) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'ISIN non valido' 
+        return res.status(400).json({
+          success: false,
+          error: 'ISIN non valido'
         });
       }
 
       if (!ticker || ticker.trim().length === 0) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Ticker obbligatorio' 
+        return res.status(400).json({
+          success: false,
+          error: 'Ticker obbligatorio'
         });
       }
 
       if (!tipologia || !['ETF', 'Stock'].includes(tipologia)) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Tipologia non valida. Valori ammessi: ETF, Stock' 
+        return res.status(400).json({
+          success: false,
+          error: 'Tipologia non valida. Valori ammessi: ETF, Stock'
         });
       }
 
-      const result = await dbService.createETF(isin, ticker.trim().toUpperCase(), tipologia);
+      if (!qty || qty.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Quantità obbligatoria'
+        });
+      }
+
+      console.log("✅ Controller - Validazione completata, qty:", qty);
+      const result = await dbService.createETF(isin, ticker.trim().toUpperCase(), tipologia, qty);
       
       if (!result.success) {
         return res.status(400).json(result);

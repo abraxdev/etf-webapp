@@ -107,6 +107,7 @@ async function loadETFs() {
                 <td><strong>${etf.isin}</strong></td>
                 <td>${etf.nome || '<span style="color: #cbd5e0;">Da recuperare</span>'}</td>
                 <td>${etf.ticker || '-'}</td>
+                <td>${etf.qty || '-'}</td>
                 <td>${etf.emittente || '-'}</td>
                 <td>
                     ${hasRendita 
@@ -142,9 +143,11 @@ document.getElementById('addEtfForm').addEventListener('submit', async (e) => {
     const tipologiaSelect = document.getElementById('tipologiaSelect');
     const isinInput = document.getElementById('isinInput');
     const tickerInput = document.getElementById('tickerInput');
+    const qtyInput = document.getElementById('qtyInput');
     const tipologia = tipologiaSelect.value;
     const isin = isinInput.value.trim().toUpperCase();
     const ticker = tickerInput.value.trim().toUpperCase();
+    const qty = qtyInput.value.trim();
     const addBtn = document.getElementById('addBtn');
 
     if (!validateISIN(isin)) {
@@ -166,7 +169,7 @@ document.getElementById('addEtfForm').addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ isin, ticker, tipologia })
+            body: JSON.stringify({ isin, ticker, tipologia, qty })
         });
 
         const result = await response.json();
@@ -181,6 +184,7 @@ document.getElementById('addEtfForm').addEventListener('submit', async (e) => {
             isinInput.value = '';
             tickerInput.value = '';
             tipologiaSelect.value = 'ETF';
+            qtyInput.value = '';
             await loadETFs();
         } else {
             showAlert(result.error || 'Errore durante l\'aggiunta', 'error');
