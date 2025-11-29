@@ -86,19 +86,19 @@ async function loadETFs() {
             // Pulsanti azioni basati sulla tipologia
             const actionButtons = isETF 
                 ? `
-                    <button class="btn btn-secondary" onclick="scrapeOne('${etf.isin}')">
-                        <i data-lucide="refresh-cw" width="18"></i>
+                    <button class="btn btn-secondary small" onclick="scrapeOne('${etf.isin}')">
+                        <i data-lucide="refresh-cw" width="16"></i>
                     </button>
-                    <button class="btn btn-secondary" onclick="viewHistory('${etf.isin}')">
-                        <i data-lucide="chart-column" width="18"></i>
+                    <button class="btn btn-secondary small" onclick="viewHistory('${etf.isin}')">
+                        <i data-lucide="chart-column" width="16"></i>
                     </button>
                   `
                 : `
-                    <button class="btn btn-secondary" disabled title="Le Stock non vengono scrapate da JustETF">
-                        <i data-lucide="refresh-cw" width="18"></i>
+                    <button class="btn btn-secondary small" disabled title="Le Stock non vengono scrapate da JustETF">
+                        <i data-lucide="refresh-cw" width="16"></i>
                     </button>
-                    <button class="btn btn-secondary" onclick="viewHistory('${etf.isin}')">
-                        <i data-lucide="chart-column" width="18"></i>
+                    <button class="btn btn-secondary small" onclick="viewHistory('${etf.isin}')">
+                        <i data-lucide="chart-column" width="16"></i>
                     </button>
                   `;
 
@@ -118,8 +118,8 @@ async function loadETFs() {
 
                 <td class="actions">
                     ${actionButtons}
-                    <button class="btn btn-danger" onclick="deleteETF('${etf.isin}')">
-                        <i data-lucide="trash-2" width="18"></i>
+                    <button class="btn btn-danger small" onclick="deleteETF('${etf.isin}')">
+                        <i data-lucide="trash-2" width="16"></i>
                     </button>
                 </td>
             `;

@@ -6,17 +6,23 @@ import authService from '../services/auth.service.js';
  */
 export const requireAuth = async (req, res, next) => {
   try {
-    // Estrai il token dall'header Authorization
-    const authHeader = req.headers.authorization;
+    let token = null;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Prova prima con i cookies (più sicuro)
+    if (req.cookies?.access_token) {
+      token = req.cookies.access_token;
+    }
+    // Fallback: header Authorization (per retrocompatibilità)
+    else if (req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         error: 'Token di autenticazione mancante'
       });
     }
-
-    const token = authHeader.substring(7); // Rimuovi 'Bearer '
 
     // Verifica il token
     const result = await authService.verifyToken(token);

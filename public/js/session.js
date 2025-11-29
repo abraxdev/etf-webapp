@@ -1,79 +1,56 @@
-// Gestione sessione globale
+// Gestione sessione globale tramite COOKIES (più sicuro)
 
-// Funzione per ottenere il token
-function getAccessToken() {
-  return localStorage.getItem('access_token');
+// Funzione per verificare se c'è un cookie (semplice check)
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
 }
 
 // Funzione per verificare se l'utente è autenticato
 function isAuthenticated() {
-  return !!getAccessToken();
+  // Verifica se esiste il cookie access_token
+  return !!getCookie('access_token');
 }
 
 // Funzione per il logout
 async function logout() {
-  const token = getAccessToken();
-
-  if (token) {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-    } catch (error) {
-      console.error('Errore durante il logout:', error);
-    }
+  try {
+    // Chiama l'API di logout (che cancellerà i cookies HttpOnly)
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include' // Importante: include i cookies nella richiesta
+    });
+  } catch (error) {
+    console.error('Errore durante il logout:', error);
   }
 
-  // Rimuovi i dati dalla localStorage
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('user');
-
-  // Redirect al login
+  // Redirect al login (i cookies sono già stati cancellati dal server)
   window.location.href = '/login';
 }
 
-// Aggiungi header Authorization a tutte le fetch
+// Intercetta le fetch per gestire errori 401
 const originalFetch = window.fetch;
 window.fetch = function(...args) {
   const [url, config = {}] = args;
 
-  // Se la richiesta è verso le API, aggiungi il token
-  if (typeof url === 'string' && url.startsWith('/api/')) {
-    const token = getAccessToken();
-
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        'Authorization': `Bearer ${token}`
-      };
-    }
-  }
+  // Assicurati che i cookies vengano sempre inviati
+  config.credentials = config.credentials || 'include';
 
   return originalFetch(url, config)
     .then(response => {
-      // Se ricevi 401, fai logout
-      if (response.status === 401) {
-        console.warn('Token scaduto o non valido. Eseguo logout...');
+      // Se ricevi 401 e non sei nella pagina di login, fai logout
+      if (response.status === 401 && !window.location.pathname.startsWith('/login')) {
+        console.warn('⚠️  Sessione scaduta o non valida. Eseguo logout...');
         logout();
       }
       return response;
     });
 };
 
-// Verifica la sessione al caricamento della pagina
+// Setup al caricamento della pagina
 document.addEventListener('DOMContentLoaded', () => {
-  // Se non sei autenticato e non sei già nella pagina di login/register, redirect
-  const currentPath = window.location.pathname;
-  const publicPaths = ['/login', '/register'];
-
-  if (!isAuthenticated() && !publicPaths.includes(currentPath)) {
-    window.location.href = '/login';
-  }
-
   // Aggiungi event listener per il logout button se esiste
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
@@ -83,11 +60,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Mostra informazioni utente se presenti
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userEmailEl = document.getElementById('userEmail');
-
-  if (userEmailEl && user.email) {
-    userEmailEl.textContent = user.email;
-  }
+  console.log('✅ Sessione gestita tramite cookies HttpOnly');
 });

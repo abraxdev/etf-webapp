@@ -41,10 +41,8 @@ async function handleLogin(e) {
     const result = await response.json();
 
     if (result.success && result.session) {
-      // Salva token e refresh token in localStorage
-      localStorage.setItem('access_token', result.session.access_token);
-      localStorage.setItem('refresh_token', result.session.refresh_token);
-      localStorage.setItem('user', JSON.stringify(result.user));
+      // I cookie sono già stati impostati dal server
+      // Non salviamo nulla in localStorage per sicurezza
 
       showAlert('Login effettuato con successo!', 'success');
 
@@ -106,22 +104,23 @@ async function handleRegister(e) {
     const result = await response.json();
 
     if (result.success) {
-      showAlert('Registrazione completata! Controlla la tua email per confermare l\'account.', 'success');
+      // I cookie sono già stati impostati dal server se c'è una sessione
 
-      // Se la sessione è disponibile, salva i token
       if (result.session) {
-        localStorage.setItem('access_token', result.session.access_token);
-        localStorage.setItem('refresh_token', result.session.refresh_token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-
+        showAlert('Registrazione completata con successo!', 'success');
         setTimeout(() => {
           window.location.href = '/dashboard';
-        }, 1500);
-      } else {
-        // Redirect al login dopo 2 secondi
+        }, 1000);
+      } else if (result.needsEmailConfirmation) {
+        showAlert('Registrazione completata! Controlla la tua email per confermare l\'account.', 'success');
         setTimeout(() => {
           window.location.href = '/login';
-        }, 2000);
+        }, 2500);
+      } else {
+        showAlert('Registrazione completata!', 'success');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
       }
     } else {
       showAlert(result.error || 'Errore durante la registrazione', 'error');
