@@ -17,29 +17,16 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    {{> header}}
 
     <main class="main-content">
         {{{body}}}
     </main>
 
-    {{> footer}}
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Session management (solo per pagine autenticate) -->
-    {{#unless noAuth}}
-    <script src="/js/session.js"></script>
-    {{/unless}}
 
-    {{#if isPortfolio}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2.3.1/dist/chartjs-chart-treemap.min.js"></script>
-    <script src="/js/portfolio.js"></script>
-    {{else if isDashboard}}
-    <script src="/js/dashboard.js"></script>
-    {{/if}}
 
     <!-- Initialize Lucide Icons -->
     <script>

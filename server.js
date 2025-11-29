@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +10,9 @@ import etfRoutes from './routes/etf.routes.js';
 import scraperRoutes from './routes/scraper.routes.js';
 import portfolioRoutes from './routes/portfolio.routes.js';
 import currencyRoutes from './routes/currency.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import { requireAuth } from './middleware/auth.middleware.js';
+import { requireAuthPage, redirectIfAuth } from './middleware/auth.middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -48,24 +52,47 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.get('/', (req, res) => {
+// Routes pubbliche (Auth)
+app.use('/api/auth', authRoutes);
+
+app.get('/login', redirectIfAuth, (req, res) => {
+  res.render('login', {
+    title: 'Login',
+    layout: 'main-no-head',
+    noAuth: true
+  });
+});
+
+// app.get('/register', redirectIfAuth, (req, res) => {
+//   res.render('register', {
+//     title: 'Registrazione',
+//     layout: 'main',
+//     noAuth: false
+//   });
+// });
+
+// Routes protette (richiedono autenticazione)
+app.get('/', requireAuthPage, (req, res) => {
   res.redirect('/dashboard');
 });
 
-app.use('/api/etf', etfRoutes);
-app.use('/api/scraper', scraperRoutes);
-app.use('/api/currency', currencyRoutes);
-app.use('/portfolio', portfolioRoutes);
+// API Routes protette
+app.use('/api/etf', requireAuth, etfRoutes);
+app.use('/api/scraper', requireAuth, scraperRoutes);
+app.use('/api/currency', requireAuth, currencyRoutes);
+app.use('/portfolio', requireAuthPage, portfolioRoutes);
 
-app.get('/dashboard', (req, res) => {
+// Pagine protette
+app.get('/dashboard', requireAuthPage, (req, res) => {
   res.render('dashboard', {
     title: 'ETF Tracker Dashboard',
     isDashboard: true,
     supabaseUrl: process.env.SUPABASE_URL,
-    supabaseKey: process.env.SUPABASE_ANON_KEY
+    supabaseKey: process.env.SUPABASE_ANON_KEY,
+    user: req.user
   });
 });
 
