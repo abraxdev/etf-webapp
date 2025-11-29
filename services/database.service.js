@@ -194,6 +194,23 @@ class DatabaseService {
       return { success: false, error: error.message };
     }
   }
+
+  // Currency Conversion
+  async getCurrencyRate(ticker) {
+    try {
+      const { data, error } = await supabase
+        .from('currency_conversion')
+        .select('rate')
+        .eq('ticker', ticker)
+        .single();
+
+      if (error) throw error;
+      return { success: true, data: data.rate };
+    } catch (error) {
+      console.error(`❌ Errore recupero tasso conversione ${ticker}:`, error.message);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 export default new DatabaseService();

@@ -8,6 +8,7 @@ import { dirname } from 'path';
 import etfRoutes from './routes/etf.routes.js';
 import scraperRoutes from './routes/scraper.routes.js';
 import portfolioRoutes from './routes/portfolio.routes.js';
+import currencyRoutes from './routes/currency.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -56,6 +57,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/etf', etfRoutes);
 app.use('/api/scraper', scraperRoutes);
+app.use('/api/currency', currencyRoutes);
 app.use('/portfolio', portfolioRoutes);
 
 app.get('/dashboard', (req, res) => {

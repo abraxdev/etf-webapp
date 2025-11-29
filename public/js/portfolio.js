@@ -3,9 +3,11 @@ let filteredData = [];
 let currentSort = { column: 'tipologia', order: 'asc' };
 let allocationChart = null;
 let treemapChart = null;
+let eur_dol_rate = 1.16; // Valore di default, verrà sovrascritto dal DB
 
 // Caricamento iniziale
 document.addEventListener('DOMContentLoaded', () => {
+  loadCurrencyRate(); // Carica il tasso di conversione
   loadPortfolio();
   setupEventListeners();
 });
@@ -18,6 +20,25 @@ function setupEventListeners() {
     currentSort.column = e.target.value;
     sortAndRender();
   });
+}
+
+// Carica il tasso di conversione EUR/USD dal database
+async function loadCurrencyRate() {
+  try {
+    console.log('💱 Caricamento tasso di conversione EUR/USD...');
+    const response = await fetch('/api/currency/EURUSD=X');
+    const result = await response.json();
+
+    if (result.success && result.rate) {
+      eur_dol_rate = parseFloat(result.rate);
+      console.log(`✅ Tasso EUR/USD caricato: ${eur_dol_rate}`);
+    } else {
+      console.warn('⚠️  Impossibile caricare il tasso EUR/USD, uso valore di default:', eur_dol_rate);
+    }
+  } catch (error) {
+    console.error('❌ Errore caricamento tasso conversione:', error);
+    console.log('⚠️  Uso tasso di default:', eur_dol_rate);
+  }
 }
 
 // Carica tutti i dati dal database
@@ -38,7 +59,7 @@ async function loadPortfolio() {
       portfolioData = result.data.map(item => {
         const qty = parseFloat(item.qty) || 0;
         const prezzo = parseFloat(item.last_price) || 0;
-        const posizione = qty * prezzo;
+        const posizione = (item.currency =="EUR") ? qty * prezzo : qty * prezzo / eur_dol_rate;
 
         // Gestisci dividend che può essere numero, stringa, NaN, N/A, null
         let dividend = 0;
@@ -481,7 +502,7 @@ function updateTreemapChart() {
           },
           color: 'white',
           font: {
-            size: 13,
+            size: 12,
             weight: 'bold',
             family: "'Inter', sans-serif"
           }
@@ -503,7 +524,7 @@ function updateTreemapChart() {
             weight: 'bold'
           },
           bodyFont: {
-            size: 13
+            size: 12
           },
           callbacks: {
             title: function(context) {
@@ -513,6 +534,7 @@ function updateTreemapChart() {
             label: function(context) {
               if (!context.raw) return '';
               const item = context.raw._data;
+              console.log.item;
               const total = portfolioData.reduce((sum, p) => sum + p.posizione, 0);
               const percentage = ((item.value / total) * 100).toFixed(2);
               return [
